@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package cabinet;
+
+message GpuStatus {
+  int32 board_id = 1;
+  int32 available_gp_us = 2;
+  float current_load = 3;
+  int32 job_queue_length = 4;
+  float memory_usage = 5;
+  float temperature = 6;
+  float clock_freq = 7;
+}
+
+message TaskStatus {
+  int32 task_id = 1;
+  int32 assigned_board = 2;
+  int32 status = 3;         // 0: pending, 1: assigned/running, 2: completed
+  string submit_time = 4;
+  string start_time = 5;
+  string gpu_req = 6;
+  int32 deadline = 7;
+  string completion_time = 8; // empty if not completed
+}
+
+message Reply {
+  string reply = 1;
+}
+
+service UpdateStatus {
+  // For periodic GPU status updates.
+  rpc UpdateGpuStatus (GpuStatus) returns (Reply);
+  // For propagating task status updates (assignment and completion).
+  rpc UpdateTaskStatus (TaskStatus) returns (Reply);
+}
+
+service Scheduler {
+  // Execute a task on a node.
+  rpc ExecuteTask (TaskStatus) returns (Reply);
+}

@@ -1,0 +1,3 @@
+pclock,latency (ms) per batch,throughput (Tx per Second)
+10,1,1000.000
+-1,1.000,72.619

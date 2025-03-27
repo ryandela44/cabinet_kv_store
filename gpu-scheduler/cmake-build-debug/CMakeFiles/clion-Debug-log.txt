@@ -1,0 +1,8 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Users/macbookpro/GolandProjects/cabinet/gpu-scheduler -B /Users/macbookpro/GolandProjects/cabinet/gpu-scheduler/cmake-build-debug
+-- Found RE2 via CMake.
+-- Using Protobuf 29.3.0
+-- Using gRPC 1.71.0
+-- Found grpc_cpp_plugin: /opt/homebrew/bin/grpc_cpp_plugin
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/macbookpro/GolandProjects/cabinet/gpu-scheduler/cmake-build-debug
