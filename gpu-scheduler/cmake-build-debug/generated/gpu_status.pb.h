@@ -58,9 +58,6 @@ extern GpuStatusDefaultTypeInternal _GpuStatus_default_instance_;
 class Reply;
 struct ReplyDefaultTypeInternal;
 extern ReplyDefaultTypeInternal _Reply_default_instance_;
-class TaskAssignment;
-struct TaskAssignmentDefaultTypeInternal;
-extern TaskAssignmentDefaultTypeInternal _TaskAssignment_default_instance_;
 class TaskStatus;
 struct TaskStatusDefaultTypeInternal;
 extern TaskStatusDefaultTypeInternal _TaskStatus_default_instance_;
@@ -226,6 +223,7 @@ class TaskStatus final : public ::google::protobuf::Message
     kSubmitTimeFieldNumber = 4,
     kStartTimeFieldNumber = 5,
     kGpuReqFieldNumber = 6,
+    kCompletionTimeFieldNumber = 8,
     kTaskIdFieldNumber = 1,
     kAssignedBoardFieldNumber = 2,
     kStatusFieldNumber = 3,
@@ -277,6 +275,22 @@ class TaskStatus final : public ::google::protobuf::Message
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_gpu_req(
       const std::string& value);
   std::string* _internal_mutable_gpu_req();
+
+  public:
+  // string completion_time = 8;
+  void clear_completion_time() ;
+  const std::string& completion_time() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_completion_time(Arg_&& arg, Args_... args);
+  std::string* mutable_completion_time();
+  PROTOBUF_NODISCARD std::string* release_completion_time();
+  void set_allocated_completion_time(std::string* value);
+
+  private:
+  const std::string& _internal_completion_time() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_completion_time(
+      const std::string& value);
+  std::string* _internal_mutable_completion_time();
 
   public:
   // int32 task_id = 1;
@@ -324,8 +338,8 @@ class TaskStatus final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 7, 0,
-      55, 2>
+      3, 8, 0,
+      78, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -345,286 +359,7 @@ class TaskStatus final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr submit_time_;
     ::google::protobuf::internal::ArenaStringPtr start_time_;
     ::google::protobuf::internal::ArenaStringPtr gpu_req_;
-    ::int32_t task_id_;
-    ::int32_t assigned_board_;
-    ::int32_t status_;
-    ::int32_t deadline_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_gpu_5fstatus_2eproto;
-};
-// -------------------------------------------------------------------
-
-class TaskAssignment final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:cabinet.TaskAssignment) */ {
- public:
-  inline TaskAssignment() : TaskAssignment(nullptr) {}
-  ~TaskAssignment() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(TaskAssignment* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(TaskAssignment));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR TaskAssignment(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline TaskAssignment(const TaskAssignment& from) : TaskAssignment(nullptr, from) {}
-  inline TaskAssignment(TaskAssignment&& from) noexcept
-      : TaskAssignment(nullptr, std::move(from)) {}
-  inline TaskAssignment& operator=(const TaskAssignment& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline TaskAssignment& operator=(TaskAssignment&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const TaskAssignment& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const TaskAssignment* internal_default_instance() {
-    return reinterpret_cast<const TaskAssignment*>(
-        &_TaskAssignment_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 2;
-  friend void swap(TaskAssignment& a, TaskAssignment& b) { a.Swap(&b); }
-  inline void Swap(TaskAssignment* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(TaskAssignment* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  TaskAssignment* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<TaskAssignment>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const TaskAssignment& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const TaskAssignment& from) { TaskAssignment::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(TaskAssignment* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "cabinet.TaskAssignment"; }
-
- protected:
-  explicit TaskAssignment(::google::protobuf::Arena* arena);
-  TaskAssignment(::google::protobuf::Arena* arena, const TaskAssignment& from);
-  TaskAssignment(::google::protobuf::Arena* arena, TaskAssignment&& from) noexcept
-      : TaskAssignment(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kSubmitTimeFieldNumber = 4,
-    kStartTimeFieldNumber = 5,
-    kGpuReqFieldNumber = 6,
-    kTaskIdFieldNumber = 1,
-    kAssignedBoardFieldNumber = 2,
-    kStatusFieldNumber = 3,
-    kDeadlineFieldNumber = 7,
-  };
-  // string submit_time = 4;
-  void clear_submit_time() ;
-  const std::string& submit_time() const;
-  template <typename Arg_ = const std::string&, typename... Args_>
-  void set_submit_time(Arg_&& arg, Args_... args);
-  std::string* mutable_submit_time();
-  PROTOBUF_NODISCARD std::string* release_submit_time();
-  void set_allocated_submit_time(std::string* value);
-
-  private:
-  const std::string& _internal_submit_time() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_submit_time(
-      const std::string& value);
-  std::string* _internal_mutable_submit_time();
-
-  public:
-  // string start_time = 5;
-  void clear_start_time() ;
-  const std::string& start_time() const;
-  template <typename Arg_ = const std::string&, typename... Args_>
-  void set_start_time(Arg_&& arg, Args_... args);
-  std::string* mutable_start_time();
-  PROTOBUF_NODISCARD std::string* release_start_time();
-  void set_allocated_start_time(std::string* value);
-
-  private:
-  const std::string& _internal_start_time() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_start_time(
-      const std::string& value);
-  std::string* _internal_mutable_start_time();
-
-  public:
-  // string gpu_req = 6;
-  void clear_gpu_req() ;
-  const std::string& gpu_req() const;
-  template <typename Arg_ = const std::string&, typename... Args_>
-  void set_gpu_req(Arg_&& arg, Args_... args);
-  std::string* mutable_gpu_req();
-  PROTOBUF_NODISCARD std::string* release_gpu_req();
-  void set_allocated_gpu_req(std::string* value);
-
-  private:
-  const std::string& _internal_gpu_req() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_gpu_req(
-      const std::string& value);
-  std::string* _internal_mutable_gpu_req();
-
-  public:
-  // int32 task_id = 1;
-  void clear_task_id() ;
-  ::int32_t task_id() const;
-  void set_task_id(::int32_t value);
-
-  private:
-  ::int32_t _internal_task_id() const;
-  void _internal_set_task_id(::int32_t value);
-
-  public:
-  // int32 assigned_board = 2;
-  void clear_assigned_board() ;
-  ::int32_t assigned_board() const;
-  void set_assigned_board(::int32_t value);
-
-  private:
-  ::int32_t _internal_assigned_board() const;
-  void _internal_set_assigned_board(::int32_t value);
-
-  public:
-  // int32 status = 3;
-  void clear_status() ;
-  ::int32_t status() const;
-  void set_status(::int32_t value);
-
-  private:
-  ::int32_t _internal_status() const;
-  void _internal_set_status(::int32_t value);
-
-  public:
-  // int32 deadline = 7;
-  void clear_deadline() ;
-  ::int32_t deadline() const;
-  void set_deadline(::int32_t value);
-
-  private:
-  ::int32_t _internal_deadline() const;
-  void _internal_set_deadline(::int32_t value);
-
-  public:
-  // @@protoc_insertion_point(class_scope:cabinet.TaskAssignment)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      3, 7, 0,
-      59, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const TaskAssignment& from_msg);
-    ::google::protobuf::internal::ArenaStringPtr submit_time_;
-    ::google::protobuf::internal::ArenaStringPtr start_time_;
-    ::google::protobuf::internal::ArenaStringPtr gpu_req_;
+    ::google::protobuf::internal::ArenaStringPtr completion_time_;
     ::int32_t task_id_;
     ::int32_t assigned_board_;
     ::int32_t status_;
@@ -696,7 +431,7 @@ class Reply final : public ::google::protobuf::Message
     return reinterpret_cast<const Reply*>(
         &_Reply_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 3;
+  static constexpr int kIndexInFileMessages = 2;
   friend void swap(Reply& a, Reply& b) { a.Swap(&b); }
   inline void Swap(Reply* other) {
     if (other == this) return;
@@ -1500,240 +1235,52 @@ inline void TaskStatus::_internal_set_deadline(::int32_t value) {
   _impl_.deadline_ = value;
 }
 
-// -------------------------------------------------------------------
-
-// TaskAssignment
-
-// int32 task_id = 1;
-inline void TaskAssignment::clear_task_id() {
+// string completion_time = 8;
+inline void TaskStatus::clear_completion_time() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.task_id_ = 0;
+  _impl_.completion_time_.ClearToEmpty();
 }
-inline ::int32_t TaskAssignment::task_id() const {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.task_id)
-  return _internal_task_id();
-}
-inline void TaskAssignment::set_task_id(::int32_t value) {
-  _internal_set_task_id(value);
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.task_id)
-}
-inline ::int32_t TaskAssignment::_internal_task_id() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.task_id_;
-}
-inline void TaskAssignment::_internal_set_task_id(::int32_t value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.task_id_ = value;
-}
-
-// int32 assigned_board = 2;
-inline void TaskAssignment::clear_assigned_board() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.assigned_board_ = 0;
-}
-inline ::int32_t TaskAssignment::assigned_board() const {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.assigned_board)
-  return _internal_assigned_board();
-}
-inline void TaskAssignment::set_assigned_board(::int32_t value) {
-  _internal_set_assigned_board(value);
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.assigned_board)
-}
-inline ::int32_t TaskAssignment::_internal_assigned_board() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.assigned_board_;
-}
-inline void TaskAssignment::_internal_set_assigned_board(::int32_t value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.assigned_board_ = value;
-}
-
-// int32 status = 3;
-inline void TaskAssignment::clear_status() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.status_ = 0;
-}
-inline ::int32_t TaskAssignment::status() const {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.status)
-  return _internal_status();
-}
-inline void TaskAssignment::set_status(::int32_t value) {
-  _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.status)
-}
-inline ::int32_t TaskAssignment::_internal_status() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.status_;
-}
-inline void TaskAssignment::_internal_set_status(::int32_t value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.status_ = value;
-}
-
-// string submit_time = 4;
-inline void TaskAssignment::clear_submit_time() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.submit_time_.ClearToEmpty();
-}
-inline const std::string& TaskAssignment::submit_time() const
+inline const std::string& TaskStatus::completion_time() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.submit_time)
-  return _internal_submit_time();
+  // @@protoc_insertion_point(field_get:cabinet.TaskStatus.completion_time)
+  return _internal_completion_time();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void TaskAssignment::set_submit_time(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void TaskStatus::set_completion_time(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.submit_time_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.submit_time)
+  _impl_.completion_time_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:cabinet.TaskStatus.completion_time)
 }
-inline std::string* TaskAssignment::mutable_submit_time() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_submit_time();
-  // @@protoc_insertion_point(field_mutable:cabinet.TaskAssignment.submit_time)
+inline std::string* TaskStatus::mutable_completion_time() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_completion_time();
+  // @@protoc_insertion_point(field_mutable:cabinet.TaskStatus.completion_time)
   return _s;
 }
-inline const std::string& TaskAssignment::_internal_submit_time() const {
+inline const std::string& TaskStatus::_internal_completion_time() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.submit_time_.Get();
+  return _impl_.completion_time_.Get();
 }
-inline void TaskAssignment::_internal_set_submit_time(const std::string& value) {
+inline void TaskStatus::_internal_set_completion_time(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.submit_time_.Set(value, GetArena());
+  _impl_.completion_time_.Set(value, GetArena());
 }
-inline std::string* TaskAssignment::_internal_mutable_submit_time() {
+inline std::string* TaskStatus::_internal_mutable_completion_time() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.submit_time_.Mutable( GetArena());
+  return _impl_.completion_time_.Mutable( GetArena());
 }
-inline std::string* TaskAssignment::release_submit_time() {
+inline std::string* TaskStatus::release_completion_time() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:cabinet.TaskAssignment.submit_time)
-  return _impl_.submit_time_.Release();
+  // @@protoc_insertion_point(field_release:cabinet.TaskStatus.completion_time)
+  return _impl_.completion_time_.Release();
 }
-inline void TaskAssignment::set_allocated_submit_time(std::string* value) {
+inline void TaskStatus::set_allocated_completion_time(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.submit_time_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.submit_time_.IsDefault()) {
-    _impl_.submit_time_.Set("", GetArena());
+  _impl_.completion_time_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.completion_time_.IsDefault()) {
+    _impl_.completion_time_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:cabinet.TaskAssignment.submit_time)
-}
-
-// string start_time = 5;
-inline void TaskAssignment::clear_start_time() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.start_time_.ClearToEmpty();
-}
-inline const std::string& TaskAssignment::start_time() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.start_time)
-  return _internal_start_time();
-}
-template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void TaskAssignment::set_start_time(Arg_&& arg,
-                                                     Args_... args) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.start_time_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.start_time)
-}
-inline std::string* TaskAssignment::mutable_start_time() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_start_time();
-  // @@protoc_insertion_point(field_mutable:cabinet.TaskAssignment.start_time)
-  return _s;
-}
-inline const std::string& TaskAssignment::_internal_start_time() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.start_time_.Get();
-}
-inline void TaskAssignment::_internal_set_start_time(const std::string& value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.start_time_.Set(value, GetArena());
-}
-inline std::string* TaskAssignment::_internal_mutable_start_time() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.start_time_.Mutable( GetArena());
-}
-inline std::string* TaskAssignment::release_start_time() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:cabinet.TaskAssignment.start_time)
-  return _impl_.start_time_.Release();
-}
-inline void TaskAssignment::set_allocated_start_time(std::string* value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.start_time_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.start_time_.IsDefault()) {
-    _impl_.start_time_.Set("", GetArena());
-  }
-  // @@protoc_insertion_point(field_set_allocated:cabinet.TaskAssignment.start_time)
-}
-
-// string gpu_req = 6;
-inline void TaskAssignment::clear_gpu_req() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.gpu_req_.ClearToEmpty();
-}
-inline const std::string& TaskAssignment::gpu_req() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.gpu_req)
-  return _internal_gpu_req();
-}
-template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void TaskAssignment::set_gpu_req(Arg_&& arg,
-                                                     Args_... args) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.gpu_req_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.gpu_req)
-}
-inline std::string* TaskAssignment::mutable_gpu_req() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_gpu_req();
-  // @@protoc_insertion_point(field_mutable:cabinet.TaskAssignment.gpu_req)
-  return _s;
-}
-inline const std::string& TaskAssignment::_internal_gpu_req() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.gpu_req_.Get();
-}
-inline void TaskAssignment::_internal_set_gpu_req(const std::string& value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.gpu_req_.Set(value, GetArena());
-}
-inline std::string* TaskAssignment::_internal_mutable_gpu_req() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.gpu_req_.Mutable( GetArena());
-}
-inline std::string* TaskAssignment::release_gpu_req() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:cabinet.TaskAssignment.gpu_req)
-  return _impl_.gpu_req_.Release();
-}
-inline void TaskAssignment::set_allocated_gpu_req(std::string* value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.gpu_req_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.gpu_req_.IsDefault()) {
-    _impl_.gpu_req_.Set("", GetArena());
-  }
-  // @@protoc_insertion_point(field_set_allocated:cabinet.TaskAssignment.gpu_req)
-}
-
-// int32 deadline = 7;
-inline void TaskAssignment::clear_deadline() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.deadline_ = 0;
-}
-inline ::int32_t TaskAssignment::deadline() const {
-  // @@protoc_insertion_point(field_get:cabinet.TaskAssignment.deadline)
-  return _internal_deadline();
-}
-inline void TaskAssignment::set_deadline(::int32_t value) {
-  _internal_set_deadline(value);
-  // @@protoc_insertion_point(field_set:cabinet.TaskAssignment.deadline)
-}
-inline ::int32_t TaskAssignment::_internal_deadline() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.deadline_;
-}
-inline void TaskAssignment::_internal_set_deadline(::int32_t value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.deadline_ = value;
+  // @@protoc_insertion_point(field_set_allocated:cabinet.TaskStatus.completion_time)
 }
 
 // -------------------------------------------------------------------

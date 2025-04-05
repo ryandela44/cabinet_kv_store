@@ -1,13 +1,14 @@
 #include <cstdint>
 
-//
-// Created by MacBook Pro on 2025-03-11.
-//
-struct Task {
-    int32_t I32_ID;
+typedef struct {
+    int32_t ID;
     float   GPU_UTILIZATION;
-    float   CPU_UTILIZATION;
     uint8_t PERIOD; //ms
+    uint8_t DEADLINE;
     uint8_t PRIORITY;
-};
+} Task;
 
+
+int execute_task(Task) {
+    return 0;
+}

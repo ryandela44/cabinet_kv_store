@@ -73,7 +73,12 @@ func (m *PerfMeter) SaveToFile() error {
 		return err
 	}
 
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+
+		}
+	}(file)
 
 	// Create a CSV writer
 	writer := csv.NewWriter(file)

@@ -19,7 +19,10 @@ type serverID = int
 type prioClock = int
 type priority = float64
 
-// Mongo DB variables
+var nextNodeIndex = 0
+
+// MongoDB instance variables
+var mongoDbLeader *mongodb.MongoLeader
 var mongoDbFollower *mongodb.MongoFollower
 
 func init() {
@@ -44,12 +47,17 @@ func main() {
 	fmt.Printf("majority: %v\n", mypriority.Majority)
 
 	if myServerID == 0 {
+		// Leader initialization: create a dedicated MongoDB instance.
+		mongoDbLeader = mongodb.NewMongoLeader(0) // Using db "tasks" (or "tasks0")
+		if mongoDbLeader == nil {
+			log.Fatal("Failed to initialize MongoDB Leader instance")
+		}
 		mypriority.PrioVal = pscheme[0]
 		establishRPCs()
 		log.Infof("establishRPCs() was successful.")
-
 		startSyncCabInstance()
 	} else {
+		// Follower initialization: create a local MongoDB instance.
 		runFollower()
 	}
 }

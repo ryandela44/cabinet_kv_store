@@ -12,6 +12,7 @@ import (
 	"syscall"
 )
 
+// ServerDock stores information for an active RPC connection.
 type ServerDock struct {
 	serverID   int
 	addr       string
@@ -21,7 +22,7 @@ type ServerDock struct {
 	jobQ       map[prioClock]chan struct{}
 }
 
-// conns does not store the operating servers' information
+// conns holds the active connections for the cluster.
 var conns = struct {
 	sync.RWMutex
 	m map[int]*ServerDock
@@ -37,16 +38,18 @@ func runFollower() {
 	myAddr := serverConfig[myServerID][ipIndex] + ":" + serverConfig[myServerID][rpcPortIndex]
 	log.Debugf("config: serverID %d | addr: %s", myServerID, myAddr)
 
-	// initialize follower
+	// Initialize follower's local MongoDB instance.
 	go mongoDBCleanUp()
 	initMongoDB()
 
+	// Register RPC service.
 	err := rpc.Register(NewCabService())
 	if err != nil {
-		log.Fatalf("rp.Reister failed | error: %v", err)
+		log.Fatalf("rpc.Register failed: %v", err)
 		return
 	}
 
+	// Start listening for incoming RPC connections.
 	listener, err := net.Listen("tcp", myAddr)
 	if err != nil {
 		log.Fatalf("ListenTCP error: %v", err)
@@ -59,56 +62,43 @@ func runFollower() {
 			log.Fatal("Accept error:", err)
 			return
 		}
-
 		go rpc.ServeConn(conn)
 	}
 }
 
 func initMongoDB() {
+	// Register the type for gob encoding.
 	gob.Register([]mongodb.Query{})
 
-	if mode == Localhost {
-		mongoDbFollower = mongodb.NewMongoFollower(mongoClientNum, int(1), myServerID)
-	} else {
-		mongoDbFollower = mongodb.NewMongoFollower(mongoClientNum, int(1), 0)
+	// Use the new MongoFollower constructor.
+	// Here, we use myServerID so that each follower maintains its own task state.
+	mongoDbFollower = mongodb.NewMongoFollower(myServerID)
+	if mongoDbFollower == nil {
+		log.Fatalf("Failed to initialize MongoDB follower instance")
 	}
 
-	println(mongodb.DataPath)
-	queriesToLoad, err := mongodb.ReadQueryFromFile(mongodb.DataPath)
+	// Optionally clear the local "tasks" table to start fresh.
+	err := mongoDbFollower.ClearTable("tasks")
 	if err != nil {
-		log.Errorf("getting load data failed | error: %v", err)
+		log.Errorf("Clean up table failed: %v", err)
 		return
 	}
 
-	err = mongoDbFollower.ClearTable("tasks")
-	if err != nil {
-		log.Errorf("clean up table failed | err: %v", err)
-		return
-	}
-
-	log.Debugf("loading data to Mongo DB")
-	_, _, err = mongoDbFollower.FollowerAPI(queriesToLoad)
-	if err != nil {
-		log.Errorf("load data failed | error: %v", err)
-		return
-	}
-
-	log.Infof("mongo DB initialization done")
+	log.Infof("MongoDB follower initialization done")
 }
 
-// mongoDBCleanUp cleans up client connections to DB upon ctrl+C
 func mongoDBCleanUp() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		log.Debugf("clean up MongoDb follower")
+		log.Debugf("Cleaning up MongoDB follower")
 		err := mongoDbFollower.CleanUp()
 		if err != nil {
-			log.Errorf("clean up MongoDB follower failed | err: %v", err)
+			log.Errorf("Clean up MongoDB follower failed: %v", err)
 			return
 		}
-		log.Infof("clean up MongoDB follower succeeded")
+		log.Infof("MongoDB follower cleanup succeeded")
 		os.Exit(1)
 	}()
 }

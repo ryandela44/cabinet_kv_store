@@ -39,8 +39,7 @@ public:
     }
 };
 
-void RunServer() {
-    std::string server_address("127.0.0.1:11000");
+void RunServer(const std::string& server_address) {
     SchedulerServiceImpl service;
 
     ServerBuilder builder;
@@ -54,6 +53,12 @@ void RunServer() {
 }
 
 int main(int argc, char** argv) {
-    RunServer();
+    // Default address is for node 0.
+    std::string server_address = "127.0.0.1:11000";
+    // If a command-line argument is provided, use that as the server address.
+    if (argc > 1) {
+        server_address = argv[1];
+    }
+    RunServer(server_address);
     return 0;
 }

@@ -27,13 +27,6 @@ message Reply {
   string reply = 1;
 }
 
-service UpdateStatus {
-  // For periodic GPU status updates.
-  rpc UpdateGpuStatus (GpuStatus) returns (Reply);
-  // For propagating task status updates (assignment and completion).
-  rpc UpdateTaskStatus (TaskStatus) returns (Reply);
-}
-
 service Scheduler {
   // Execute a task on a node.
   rpc ExecuteTask (TaskStatus) returns (Reply);

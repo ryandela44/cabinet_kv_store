@@ -16,7 +16,7 @@ func NewCabService() *CabService {
 type Args struct {
 	PrioClock int
 	PrioVal   float64
-	CmdMongo  []mongodb.Query
+	CmdMongo  mongodb.Query
 }
 
 type ReplyInfo struct {
