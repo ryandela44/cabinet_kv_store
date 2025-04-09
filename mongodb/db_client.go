@@ -120,7 +120,9 @@ func dbUpdate(db *mongo.Database, table string, key string, values map[string]st
 	for f, v := range values {
 		updateValues = append(updateValues, bson.E{Key: f, Value: v})
 	}
-	_, err := coll.UpdateMany(context.TODO(), filter, bson.D{{Key: "$set", Value: updateValues}})
+	update := bson.D{{Key: "$set", Value: updateValues}}
+	opts := options.Update().SetUpsert(true)
+	_, err := coll.UpdateMany(context.TODO(), filter, update, opts)
 	return err
 }
 

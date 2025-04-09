@@ -37,6 +37,9 @@ inline constexpr TaskStatus::Impl_::Impl_(
         gpu_req_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        completion_time_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         task_id_{0},
         assigned_board_{0},
         status_{0},
@@ -62,43 +65,6 @@ struct TaskStatusDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 TaskStatusDefaultTypeInternal _TaskStatus_default_instance_;
-
-inline constexpr TaskAssignment::Impl_::Impl_(
-    ::_pbi::ConstantInitialized) noexcept
-      : submit_time_(
-            &::google::protobuf::internal::fixed_address_empty_string,
-            ::_pbi::ConstantInitialized()),
-        start_time_(
-            &::google::protobuf::internal::fixed_address_empty_string,
-            ::_pbi::ConstantInitialized()),
-        gpu_req_(
-            &::google::protobuf::internal::fixed_address_empty_string,
-            ::_pbi::ConstantInitialized()),
-        task_id_{0},
-        assigned_board_{0},
-        status_{0},
-        deadline_{0},
-        _cached_size_{0} {}
-
-template <typename>
-PROTOBUF_CONSTEXPR TaskAssignment::TaskAssignment(::_pbi::ConstantInitialized)
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-    : ::google::protobuf::Message(_class_data_.base()),
-#else   // PROTOBUF_CUSTOM_VTABLE
-    : ::google::protobuf::Message(),
-#endif  // PROTOBUF_CUSTOM_VTABLE
-      _impl_(::_pbi::ConstantInitialized()) {
-}
-struct TaskAssignmentDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR TaskAssignmentDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
-  ~TaskAssignmentDefaultTypeInternal() {}
-  union {
-    TaskAssignment _instance;
-  };
-};
-
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
-    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 TaskAssignmentDefaultTypeInternal _TaskAssignment_default_instance_;
 
 inline constexpr Reply::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -195,21 +161,7 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::cabinet::TaskStatus, _impl_.start_time_),
         PROTOBUF_FIELD_OFFSET(::cabinet::TaskStatus, _impl_.gpu_req_),
         PROTOBUF_FIELD_OFFSET(::cabinet::TaskStatus, _impl_.deadline_),
-        ~0u,  // no _has_bits_
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _internal_metadata_),
-        ~0u,  // no _extensions_
-        ~0u,  // no _oneof_case_
-        ~0u,  // no _weak_field_map_
-        ~0u,  // no _inlined_string_donated_
-        ~0u,  // no _split_
-        ~0u,  // no sizeof(Split)
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.task_id_),
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.assigned_board_),
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.status_),
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.submit_time_),
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.start_time_),
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.gpu_req_),
-        PROTOBUF_FIELD_OFFSET(::cabinet::TaskAssignment, _impl_.deadline_),
+        PROTOBUF_FIELD_OFFSET(::cabinet::TaskStatus, _impl_.completion_time_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::cabinet::Reply, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -225,13 +177,11 @@ static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::cabinet::GpuStatus)},
         {15, -1, -1, sizeof(::cabinet::TaskStatus)},
-        {30, -1, -1, sizeof(::cabinet::TaskAssignment)},
-        {45, -1, -1, sizeof(::cabinet::Reply)},
+        {31, -1, -1, sizeof(::cabinet::Reply)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::cabinet::_GpuStatus_default_instance_._instance,
     &::cabinet::_TaskStatus_default_instance_._instance,
-    &::cabinet::_TaskAssignment_default_instance_._instance,
     &::cabinet::_Reply_default_instance_._instance,
 };
 const char descriptor_table_protodef_gpu_5fstatus_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
@@ -240,33 +190,26 @@ const char descriptor_table_protodef_gpu_5fstatus_2eproto[] ABSL_ATTRIBUTE_SECTI
     "s\022\020\n\010board_id\030\001 \001(\005\022\027\n\017available_gp_us\030\002"
     " \001(\005\022\024\n\014current_load\030\003 \001(\002\022\030\n\020job_queue_"
     "length\030\004 \001(\005\022\024\n\014memory_usage\030\005 \001(\002\022\023\n\013te"
-    "mperature\030\006 \001(\002\022\022\n\nclock_freq\030\007 \001(\002\"\221\001\n\n"
+    "mperature\030\006 \001(\002\022\022\n\nclock_freq\030\007 \001(\002\"\252\001\n\n"
     "TaskStatus\022\017\n\007task_id\030\001 \001(\005\022\026\n\016assigned_"
     "board\030\002 \001(\005\022\016\n\006status\030\003 \001(\005\022\023\n\013submit_ti"
     "me\030\004 \001(\t\022\022\n\nstart_time\030\005 \001(\t\022\017\n\007gpu_req\030"
-    "\006 \001(\t\022\020\n\010deadline\030\007 \001(\005\"\225\001\n\016TaskAssignme"
-    "nt\022\017\n\007task_id\030\001 \001(\005\022\026\n\016assigned_board\030\002 "
-    "\001(\005\022\016\n\006status\030\003 \001(\005\022\023\n\013submit_time\030\004 \001(\t"
-    "\022\022\n\nstart_time\030\005 \001(\t\022\017\n\007gpu_req\030\006 \001(\t\022\020\n"
-    "\010deadline\030\007 \001(\005\"\026\n\005Reply\022\r\n\005reply\030\001 \001(\t2"
-    "\206\001\n\014UpdateStatus\0225\n\017UpdateGpuStatus\022\022.ca"
-    "binet.GpuStatus\032\016.cabinet.Reply\022\?\n\024Updat"
-    "eTaskAssignment\022\027.cabinet.TaskAssignment"
-    "\032\016.cabinet.Reply2\?\n\tScheduler\0222\n\013Execute"
-    "Task\022\023.cabinet.TaskStatus\032\016.cabinet.Repl"
-    "yb\006proto3"
+    "\006 \001(\t\022\020\n\010deadline\030\007 \001(\005\022\027\n\017completion_ti"
+    "me\030\010 \001(\t\"\026\n\005Reply\022\r\n\005reply\030\001 \001(\t2\?\n\tSche"
+    "duler\0222\n\013ExecuteTask\022\023.cabinet.TaskStatu"
+    "s\032\016.cabinet.Replyb\006proto3"
 };
 static ::absl::once_flag descriptor_table_gpu_5fstatus_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_gpu_5fstatus_2eproto = {
     false,
     false,
-    729,
+    465,
     descriptor_table_protodef_gpu_5fstatus_2eproto,
     "gpu_status.proto",
     &descriptor_table_gpu_5fstatus_2eproto_once,
     nullptr,
     0,
-    4,
+    3,
     schemas,
     file_default_instances,
     TableStruct_gpu_5fstatus_2eproto::offsets,
@@ -638,6 +581,7 @@ inline PROTOBUF_NDEBUG_INLINE TaskStatus::Impl_::Impl_(
       : submit_time_(arena, from.submit_time_),
         start_time_(arena, from.start_time_),
         gpu_req_(arena, from.gpu_req_),
+        completion_time_(arena, from.completion_time_),
         _cached_size_{0} {}
 
 TaskStatus::TaskStatus(
@@ -669,6 +613,7 @@ inline PROTOBUF_NDEBUG_INLINE TaskStatus::Impl_::Impl_(
       : submit_time_(arena),
         start_time_(arena),
         gpu_req_(arena),
+        completion_time_(arena),
         _cached_size_{0} {}
 
 inline void TaskStatus::SharedCtor(::_pb::Arena* arena) {
@@ -691,6 +636,7 @@ inline void TaskStatus::SharedDtor(MessageLite& self) {
   this_._impl_.submit_time_.Destroy();
   this_._impl_.start_time_.Destroy();
   this_._impl_.gpu_req_.Destroy();
+  this_._impl_.completion_time_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -730,15 +676,15 @@ const ::google::protobuf::internal::ClassData* TaskStatus::GetClassData() const 
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 7, 0, 55, 2> TaskStatus::_table_ = {
+const ::_pbi::TcParseTable<3, 8, 0, 78, 2> TaskStatus::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    7, 56,  // max_field_number, fast_idx_mask
+    8, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967168,  // skipmap
+    4294967040,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    7,  // num_field_entries
+    8,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -748,7 +694,9 @@ const ::_pbi::TcParseTable<3, 7, 0, 55, 2> TaskStatus::_table_ = {
     ::_pbi::TcParser::GetTable<::cabinet::TaskStatus>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    {::_pbi::TcParser::MiniParse, {}},
+    // string completion_time = 8;
+    {::_pbi::TcParser::FastUS1,
+     {66, 63, 0, PROTOBUF_FIELD_OFFSET(TaskStatus, _impl_.completion_time_)}},
     // int32 task_id = 1;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(TaskStatus, _impl_.task_id_), 63>(),
      {8, 63, 0, PROTOBUF_FIELD_OFFSET(TaskStatus, _impl_.task_id_)}},
@@ -794,14 +742,18 @@ const ::_pbi::TcParseTable<3, 7, 0, 55, 2> TaskStatus::_table_ = {
     // int32 deadline = 7;
     {PROTOBUF_FIELD_OFFSET(TaskStatus, _impl_.deadline_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
+    // string completion_time = 8;
+    {PROTOBUF_FIELD_OFFSET(TaskStatus, _impl_.completion_time_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\22\0\0\0\13\12\7\0"
+    "\22\0\0\0\13\12\7\0\17\0\0\0\0\0\0\0"
     "cabinet.TaskStatus"
     "submit_time"
     "start_time"
     "gpu_req"
+    "completion_time"
   }},
 };
 
@@ -815,6 +767,7 @@ PROTOBUF_NOINLINE void TaskStatus::Clear() {
   _impl_.submit_time_.ClearToEmpty();
   _impl_.start_time_.ClearToEmpty();
   _impl_.gpu_req_.ClearToEmpty();
+  _impl_.completion_time_.ClearToEmpty();
   ::memset(&_impl_.task_id_, 0, static_cast<::size_t>(
       reinterpret_cast<char*>(&_impl_.deadline_) -
       reinterpret_cast<char*>(&_impl_.task_id_)) + sizeof(_impl_.deadline_));
@@ -888,6 +841,14 @@ PROTOBUF_NOINLINE void TaskStatus::Clear() {
                     stream, this_._internal_deadline(), target);
           }
 
+          // string completion_time = 8;
+          if (!this_._internal_completion_time().empty()) {
+            const std::string& _s = this_._internal_completion_time();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "cabinet.TaskStatus.completion_time");
+            target = stream->WriteStringMaybeAliased(8, _s, target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -927,6 +888,11 @@ PROTOBUF_NOINLINE void TaskStatus::Clear() {
             if (!this_._internal_gpu_req().empty()) {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_gpu_req());
+            }
+            // string completion_time = 8;
+            if (!this_._internal_completion_time().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_completion_time());
             }
             // int32 task_id = 1;
             if (this_._internal_task_id() != 0) {
@@ -970,6 +936,9 @@ void TaskStatus::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::goog
   if (!from._internal_gpu_req().empty()) {
     _this->_internal_set_gpu_req(from._internal_gpu_req());
   }
+  if (!from._internal_completion_time().empty()) {
+    _this->_internal_set_completion_time(from._internal_completion_time());
+  }
   if (from._internal_task_id() != 0) {
     _this->_impl_.task_id_ = from._impl_.task_id_;
   }
@@ -1001,6 +970,7 @@ void TaskStatus::InternalSwap(TaskStatus* PROTOBUF_RESTRICT other) {
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.submit_time_, &other->_impl_.submit_time_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.start_time_, &other->_impl_.start_time_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.gpu_req_, &other->_impl_.gpu_req_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.completion_time_, &other->_impl_.completion_time_, arena);
   ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(TaskStatus, _impl_.deadline_)
       + sizeof(TaskStatus::_impl_.deadline_)
@@ -1010,401 +980,6 @@ void TaskStatus::InternalSwap(TaskStatus* PROTOBUF_RESTRICT other) {
 }
 
 ::google::protobuf::Metadata TaskStatus::GetMetadata() const {
-  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
-}
-// ===================================================================
-
-class TaskAssignment::_Internal {
- public:
-};
-
-TaskAssignment::TaskAssignment(::google::protobuf::Arena* arena)
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-    : ::google::protobuf::Message(arena, _class_data_.base()) {
-#else   // PROTOBUF_CUSTOM_VTABLE
-    : ::google::protobuf::Message(arena) {
-#endif  // PROTOBUF_CUSTOM_VTABLE
-  SharedCtor(arena);
-  // @@protoc_insertion_point(arena_constructor:cabinet.TaskAssignment)
-}
-inline PROTOBUF_NDEBUG_INLINE TaskAssignment::Impl_::Impl_(
-    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
-    const Impl_& from, const ::cabinet::TaskAssignment& from_msg)
-      : submit_time_(arena, from.submit_time_),
-        start_time_(arena, from.start_time_),
-        gpu_req_(arena, from.gpu_req_),
-        _cached_size_{0} {}
-
-TaskAssignment::TaskAssignment(
-    ::google::protobuf::Arena* arena,
-    const TaskAssignment& from)
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-    : ::google::protobuf::Message(arena, _class_data_.base()) {
-#else   // PROTOBUF_CUSTOM_VTABLE
-    : ::google::protobuf::Message(arena) {
-#endif  // PROTOBUF_CUSTOM_VTABLE
-  TaskAssignment* const _this = this;
-  (void)_this;
-  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
-      from._internal_metadata_);
-  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
-  ::memcpy(reinterpret_cast<char *>(&_impl_) +
-               offsetof(Impl_, task_id_),
-           reinterpret_cast<const char *>(&from._impl_) +
-               offsetof(Impl_, task_id_),
-           offsetof(Impl_, deadline_) -
-               offsetof(Impl_, task_id_) +
-               sizeof(Impl_::deadline_));
-
-  // @@protoc_insertion_point(copy_constructor:cabinet.TaskAssignment)
-}
-inline PROTOBUF_NDEBUG_INLINE TaskAssignment::Impl_::Impl_(
-    ::google::protobuf::internal::InternalVisibility visibility,
-    ::google::protobuf::Arena* arena)
-      : submit_time_(arena),
-        start_time_(arena),
-        gpu_req_(arena),
-        _cached_size_{0} {}
-
-inline void TaskAssignment::SharedCtor(::_pb::Arena* arena) {
-  new (&_impl_) Impl_(internal_visibility(), arena);
-  ::memset(reinterpret_cast<char *>(&_impl_) +
-               offsetof(Impl_, task_id_),
-           0,
-           offsetof(Impl_, deadline_) -
-               offsetof(Impl_, task_id_) +
-               sizeof(Impl_::deadline_));
-}
-TaskAssignment::~TaskAssignment() {
-  // @@protoc_insertion_point(destructor:cabinet.TaskAssignment)
-  SharedDtor(*this);
-}
-inline void TaskAssignment::SharedDtor(MessageLite& self) {
-  TaskAssignment& this_ = static_cast<TaskAssignment&>(self);
-  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
-  ABSL_DCHECK(this_.GetArena() == nullptr);
-  this_._impl_.submit_time_.Destroy();
-  this_._impl_.start_time_.Destroy();
-  this_._impl_.gpu_req_.Destroy();
-  this_._impl_.~Impl_();
-}
-
-inline void* TaskAssignment::PlacementNew_(const void*, void* mem,
-                                        ::google::protobuf::Arena* arena) {
-  return ::new (mem) TaskAssignment(arena);
-}
-constexpr auto TaskAssignment::InternalNewImpl_() {
-  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(TaskAssignment),
-                                            alignof(TaskAssignment));
-}
-PROTOBUF_CONSTINIT
-PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::google::protobuf::internal::ClassDataFull TaskAssignment::_class_data_ = {
-    ::google::protobuf::internal::ClassData{
-        &_TaskAssignment_default_instance_._instance,
-        &_table_.header,
-        nullptr,  // OnDemandRegisterArenaDtor
-        nullptr,  // IsInitialized
-        &TaskAssignment::MergeImpl,
-        ::google::protobuf::Message::GetNewImpl<TaskAssignment>(),
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-        &TaskAssignment::SharedDtor,
-        ::google::protobuf::Message::GetClearImpl<TaskAssignment>(), &TaskAssignment::ByteSizeLong,
-            &TaskAssignment::_InternalSerialize,
-#endif  // PROTOBUF_CUSTOM_VTABLE
-        PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_._cached_size_),
-        false,
-    },
-    &TaskAssignment::kDescriptorMethods,
-    &descriptor_table_gpu_5fstatus_2eproto,
-    nullptr,  // tracker
-};
-const ::google::protobuf::internal::ClassData* TaskAssignment::GetClassData() const {
-  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
-  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
-  return _class_data_.base();
-}
-PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 7, 0, 59, 2> TaskAssignment::_table_ = {
-  {
-    0,  // no _has_bits_
-    0, // no _extensions_
-    7, 56,  // max_field_number, fast_idx_mask
-    offsetof(decltype(_table_), field_lookup_table),
-    4294967168,  // skipmap
-    offsetof(decltype(_table_), field_entries),
-    7,  // num_field_entries
-    0,  // num_aux_entries
-    offsetof(decltype(_table_), field_names),  // no aux_entries
-    _class_data_.base(),
-    nullptr,  // post_loop_handler
-    ::_pbi::TcParser::GenericFallback,  // fallback
-    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
-    ::_pbi::TcParser::GetTable<::cabinet::TaskAssignment>(),  // to_prefetch
-    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
-  }, {{
-    {::_pbi::TcParser::MiniParse, {}},
-    // int32 task_id = 1;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(TaskAssignment, _impl_.task_id_), 63>(),
-     {8, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.task_id_)}},
-    // int32 assigned_board = 2;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(TaskAssignment, _impl_.assigned_board_), 63>(),
-     {16, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.assigned_board_)}},
-    // int32 status = 3;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(TaskAssignment, _impl_.status_), 63>(),
-     {24, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.status_)}},
-    // string submit_time = 4;
-    {::_pbi::TcParser::FastUS1,
-     {34, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.submit_time_)}},
-    // string start_time = 5;
-    {::_pbi::TcParser::FastUS1,
-     {42, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.start_time_)}},
-    // string gpu_req = 6;
-    {::_pbi::TcParser::FastUS1,
-     {50, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.gpu_req_)}},
-    // int32 deadline = 7;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(TaskAssignment, _impl_.deadline_), 63>(),
-     {56, 63, 0, PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.deadline_)}},
-  }}, {{
-    65535, 65535
-  }}, {{
-    // int32 task_id = 1;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.task_id_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
-    // int32 assigned_board = 2;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.assigned_board_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
-    // int32 status = 3;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.status_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
-    // string submit_time = 4;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.submit_time_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // string start_time = 5;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.start_time_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // string gpu_req = 6;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.gpu_req_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // int32 deadline = 7;
-    {PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.deadline_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
-  }},
-  // no aux_entries
-  {{
-    "\26\0\0\0\13\12\7\0"
-    "cabinet.TaskAssignment"
-    "submit_time"
-    "start_time"
-    "gpu_req"
-  }},
-};
-
-PROTOBUF_NOINLINE void TaskAssignment::Clear() {
-// @@protoc_insertion_point(message_clear_start:cabinet.TaskAssignment)
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::uint32_t cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _impl_.submit_time_.ClearToEmpty();
-  _impl_.start_time_.ClearToEmpty();
-  _impl_.gpu_req_.ClearToEmpty();
-  ::memset(&_impl_.task_id_, 0, static_cast<::size_t>(
-      reinterpret_cast<char*>(&_impl_.deadline_) -
-      reinterpret_cast<char*>(&_impl_.task_id_)) + sizeof(_impl_.deadline_));
-  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
-}
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-        ::uint8_t* TaskAssignment::_InternalSerialize(
-            const MessageLite& base, ::uint8_t* target,
-            ::google::protobuf::io::EpsCopyOutputStream* stream) {
-          const TaskAssignment& this_ = static_cast<const TaskAssignment&>(base);
-#else   // PROTOBUF_CUSTOM_VTABLE
-        ::uint8_t* TaskAssignment::_InternalSerialize(
-            ::uint8_t* target,
-            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-          const TaskAssignment& this_ = *this;
-#endif  // PROTOBUF_CUSTOM_VTABLE
-          // @@protoc_insertion_point(serialize_to_array_start:cabinet.TaskAssignment)
-          ::uint32_t cached_has_bits = 0;
-          (void)cached_has_bits;
-
-          // int32 task_id = 1;
-          if (this_._internal_task_id() != 0) {
-            target = ::google::protobuf::internal::WireFormatLite::
-                WriteInt32ToArrayWithField<1>(
-                    stream, this_._internal_task_id(), target);
-          }
-
-          // int32 assigned_board = 2;
-          if (this_._internal_assigned_board() != 0) {
-            target = ::google::protobuf::internal::WireFormatLite::
-                WriteInt32ToArrayWithField<2>(
-                    stream, this_._internal_assigned_board(), target);
-          }
-
-          // int32 status = 3;
-          if (this_._internal_status() != 0) {
-            target = ::google::protobuf::internal::WireFormatLite::
-                WriteInt32ToArrayWithField<3>(
-                    stream, this_._internal_status(), target);
-          }
-
-          // string submit_time = 4;
-          if (!this_._internal_submit_time().empty()) {
-            const std::string& _s = this_._internal_submit_time();
-            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "cabinet.TaskAssignment.submit_time");
-            target = stream->WriteStringMaybeAliased(4, _s, target);
-          }
-
-          // string start_time = 5;
-          if (!this_._internal_start_time().empty()) {
-            const std::string& _s = this_._internal_start_time();
-            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "cabinet.TaskAssignment.start_time");
-            target = stream->WriteStringMaybeAliased(5, _s, target);
-          }
-
-          // string gpu_req = 6;
-          if (!this_._internal_gpu_req().empty()) {
-            const std::string& _s = this_._internal_gpu_req();
-            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "cabinet.TaskAssignment.gpu_req");
-            target = stream->WriteStringMaybeAliased(6, _s, target);
-          }
-
-          // int32 deadline = 7;
-          if (this_._internal_deadline() != 0) {
-            target = ::google::protobuf::internal::WireFormatLite::
-                WriteInt32ToArrayWithField<7>(
-                    stream, this_._internal_deadline(), target);
-          }
-
-          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
-            target =
-                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
-          }
-          // @@protoc_insertion_point(serialize_to_array_end:cabinet.TaskAssignment)
-          return target;
-        }
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-        ::size_t TaskAssignment::ByteSizeLong(const MessageLite& base) {
-          const TaskAssignment& this_ = static_cast<const TaskAssignment&>(base);
-#else   // PROTOBUF_CUSTOM_VTABLE
-        ::size_t TaskAssignment::ByteSizeLong() const {
-          const TaskAssignment& this_ = *this;
-#endif  // PROTOBUF_CUSTOM_VTABLE
-          // @@protoc_insertion_point(message_byte_size_start:cabinet.TaskAssignment)
-          ::size_t total_size = 0;
-
-          ::uint32_t cached_has_bits = 0;
-          // Prevent compiler warnings about cached_has_bits being unused
-          (void)cached_has_bits;
-
-          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
-           {
-            // string submit_time = 4;
-            if (!this_._internal_submit_time().empty()) {
-              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
-                                              this_._internal_submit_time());
-            }
-            // string start_time = 5;
-            if (!this_._internal_start_time().empty()) {
-              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
-                                              this_._internal_start_time());
-            }
-            // string gpu_req = 6;
-            if (!this_._internal_gpu_req().empty()) {
-              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
-                                              this_._internal_gpu_req());
-            }
-            // int32 task_id = 1;
-            if (this_._internal_task_id() != 0) {
-              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
-                  this_._internal_task_id());
-            }
-            // int32 assigned_board = 2;
-            if (this_._internal_assigned_board() != 0) {
-              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
-                  this_._internal_assigned_board());
-            }
-            // int32 status = 3;
-            if (this_._internal_status() != 0) {
-              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
-                  this_._internal_status());
-            }
-            // int32 deadline = 7;
-            if (this_._internal_deadline() != 0) {
-              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
-                  this_._internal_deadline());
-            }
-          }
-          return this_.MaybeComputeUnknownFieldsSize(total_size,
-                                                     &this_._impl_._cached_size_);
-        }
-
-void TaskAssignment::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
-  auto* const _this = static_cast<TaskAssignment*>(&to_msg);
-  auto& from = static_cast<const TaskAssignment&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:cabinet.TaskAssignment)
-  ABSL_DCHECK_NE(&from, _this);
-  ::uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (!from._internal_submit_time().empty()) {
-    _this->_internal_set_submit_time(from._internal_submit_time());
-  }
-  if (!from._internal_start_time().empty()) {
-    _this->_internal_set_start_time(from._internal_start_time());
-  }
-  if (!from._internal_gpu_req().empty()) {
-    _this->_internal_set_gpu_req(from._internal_gpu_req());
-  }
-  if (from._internal_task_id() != 0) {
-    _this->_impl_.task_id_ = from._impl_.task_id_;
-  }
-  if (from._internal_assigned_board() != 0) {
-    _this->_impl_.assigned_board_ = from._impl_.assigned_board_;
-  }
-  if (from._internal_status() != 0) {
-    _this->_impl_.status_ = from._impl_.status_;
-  }
-  if (from._internal_deadline() != 0) {
-    _this->_impl_.deadline_ = from._impl_.deadline_;
-  }
-  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
-}
-
-void TaskAssignment::CopyFrom(const TaskAssignment& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:cabinet.TaskAssignment)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-
-void TaskAssignment::InternalSwap(TaskAssignment* PROTOBUF_RESTRICT other) {
-  using std::swap;
-  auto* arena = GetArena();
-  ABSL_DCHECK_EQ(arena, other->GetArena());
-  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.submit_time_, &other->_impl_.submit_time_, arena);
-  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.start_time_, &other->_impl_.start_time_, arena);
-  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.gpu_req_, &other->_impl_.gpu_req_, arena);
-  ::google::protobuf::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.deadline_)
-      + sizeof(TaskAssignment::_impl_.deadline_)
-      - PROTOBUF_FIELD_OFFSET(TaskAssignment, _impl_.task_id_)>(
-          reinterpret_cast<char*>(&_impl_.task_id_),
-          reinterpret_cast<char*>(&other->_impl_.task_id_));
-}
-
-::google::protobuf::Metadata TaskAssignment::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // ===================================================================

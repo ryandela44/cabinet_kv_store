@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"math/rand"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -50,8 +51,17 @@ func loadTasksContinuously() {
 				pushTask(q)
 			}
 		}
-		time.Sleep(1 * time.Second) // adjust as needed
+		time.Sleep(5 * time.Millisecond)
 	}
+}
+
+// isDuplicateKeyError returns true if the error's text indicates a duplicate key error.
+func isDuplicateKeyError(err error) bool {
+	if err == nil {
+		return false
+	}
+	// Customize this check based on your MongoDB driver error text.
+	return strings.Contains(err.Error(), "duplicate key")
 }
 
 func startSyncCabInstance() {
@@ -69,7 +79,6 @@ func startSyncCabInstance() {
 	// Start the continuous task loader.
 	go loadTasksContinuously()
 
-	// Main consensus loop: process tasks from the queue.
 	for {
 		// Wait until a task is available.
 		var task mongodb.Query
@@ -83,109 +92,168 @@ func startSyncCabInstance() {
 		}
 
 		serviceMethod := "CabService.ConsensusService"
-		receiver := make(chan ReplyInfo, numOfServers)
-
-		// Crash tests (if configured)
-		if leaderPClock == crashTime && crashMode != 0 {
-			conns.Lock()
-			for _, sID := range crashList {
-				delete(conns.m, sID)
-			}
-			conns.Unlock()
-		}
-
+		// --- Consensus Round 1: Assignment Update ---
 		startTime := time.Now()
 
-		// 1. Get Priority.
+		// Get follower priorities.
 		fpriorities := pManager.GetFollowerPriorities(leaderPClock)
-		log.Infof("pClock: %v | priorities: %+v", leaderPClock, fpriorities)
-		log.Infof("pClock: %v | quorum size (t+1) is %v | majority: %v",
+		log.Infof("Round1 (Assignment) - pClock: %v | priorities: %+v", leaderPClock, fpriorities)
+		log.Infof("Round1 - pClock: %v | quorum size (t+1) is %v | majority: %v",
 			leaderPClock, pManager.GetQuorumSize(), mypriority.Majority)
-
 		if dynamicT {
 			q := <-possibleTs
 			fpriorities = pManager.SetNewPrioritiesUnderNewT(numOfServers, q+1, 1, ratioTryStep, leaderPClock)
-			log.Infof("pClock: %v | NEW priorities: %+v", leaderPClock, fpriorities)
-			log.Infof("pClock: %v | NEW quorum size (t+1) is %v | majority: %v",
-				leaderPClock, pManager.GetQuorumSize(), mypriority.Majority)
+			log.Infof("Round1 - pClock: %v | NEW priorities: %+v", leaderPClock, fpriorities)
 		}
 
-		// 2. Assignment: choose node via round-robin.
+		// Assignment: choose node via round-robin.
 		selectedNode := getNextNode(numOfServers)
 		task.Values["assigned_board"] = strconv.Itoa(selectedNode)
 		assignQuery := createAssignmentUpdateQuery(task, selectedNode)
+		// Update the leader’s DB.
 		_, _, err := mongoDbLeader.LeaderAPI(assignQuery)
-		if err != nil {
-			log.Errorf("Assignment update failed for task Key=%v: %v", task.Key, err)
+		if err != nil && !isDuplicateKeyError(err) {
+			log.Errorf("Round1: Assignment update failed for task Key=%v: %v", task.Key, err)
 			continue
+		} else if isDuplicateKeyError(err) {
+			log.Warnf("Round1: Duplicate key error for task Key=%v; ignoring", task.Key)
 		}
-
 		perfM.RecordStarter(leaderPClock)
 
-		// 3. Issue consensus RPC calls.
-		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, task) {
+		// Propagate the assignment update via consensus.
+		receiver := make(chan ReplyInfo, numOfServers)
+		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, assignQuery) {
 			if err := perfM.SaveToFile(); err != nil {
-				log.Errorf("perfM save to file failed: %v", err)
+				log.Errorf("Round1: perfM save to file failed: %v", err)
 			}
 			return
 		}
 
-		// 4. Wait for consensus RPC responses.
+		// Wait for consensus responses.
 		prioSum := mypriority.PrioVal
 		prioQueue := make(chan serverID, numOfServers)
-		var followersResults []ReplyInfo
 		for rinfo := range receiver {
 			prioQueue <- rinfo.SID
-			log.Infof("Received RPC response: pClock: %v | serverID: %v", leaderPClock, rinfo.SID)
+			log.Infof("Round1: Received RPC response: pClock: %v | serverID: %v", leaderPClock, rinfo.SID)
 			fpriorities = pManager.GetFollowerPriorities(leaderPClock)
 			prioSum += fpriorities[rinfo.SID]
-			followersResults = append(followersResults, rinfo)
 			if prioSum > mypriority.Majority {
 				if err := perfM.RecordFinisher(leaderPClock); err != nil {
-					log.Errorf("PerfMeter failed: %v", err)
+					log.Errorf("Round1: PerfMeter failed: %v", err)
 					return
 				}
 				mystate.AddCommitIndex(batchsize)
-				log.Infof("Consensus reached | pClock: %v | elapsed: %v ms | commitIndex: %v",
+				log.Infof("Round1: Consensus reached | pClock: %v | elapsed: %v ms | commitIndex: %v",
 					leaderPClock, time.Since(startTime).Milliseconds(), mystate.GetCommitIndex())
 				break
 			}
 		}
-
-		// 5. Task Execution: send task to scheduler via gRPC.
-		taskId, err := strconv.Atoi(task.Key)
-		if err != nil {
-			log.Errorf("Invalid TaskID for task Key=%v: %v", task.Key, err)
-			continue
-		}
-		assignedNode, err := strconv.Atoi(task.Values["assigned_board"])
-		if err != nil {
-			log.Errorf("Invalid assigned_board for task Key=%v: %v", task.Key, err)
-			continue
-		}
-		schedulerAddress := getSchedulerAddress(assignedNode)
-		reply, err := sendTaskToScheduler(schedulerAddress, task)
-		if err != nil {
-			log.Errorf("sendTaskToScheduler failed for task Key=%v: %v", task.Key, err)
-			continue
-		}
-		log.Infof("Task %v (TaskID=%v) executed with reply: %v", task.Key, taskId, reply)
-
-		// 6. Finalization: mark task as completed.
-		completionTime := time.Now().Format(time.RFC3339)
-		updatedQuery := createFinalizationUpdateQuery(task, completionTime)
-		_, _, err = mongoDbLeader.LeaderAPI(updatedQuery)
-		if err != nil {
-			log.Errorf("Finalization update failed: %v", err)
-		}
-
 		leaderPClock++
 		err = pManager.UpdateFollowerPriorities(leaderPClock, prioQueue, mystate.GetLeaderID())
 		if err != nil {
-			log.Errorf("UpdateFollowerPriorities failed: %v", err)
+			log.Errorf("Round1: UpdateFollowerPriorities failed: %v", err)
 			return
 		}
-		log.Infof("Priority updated for pClock %v", leaderPClock)
+		log.Infof("Round1: Priority updated for pClock %v", leaderPClock)
+
+		// --- Consensus Round 2: Start Time Update ---
+		startTime = time.Now()
+		// Record the dispatch time.
+		startTimeStr := time.Now().Format(time.RFC3339)
+		task.Values["start_time"] = startTimeStr
+		startUpdateQuery := createStartTimeUpdateQuery(task, startTimeStr)
+		// Update leader’s DB.
+		_, _, err = mongoDbLeader.LeaderAPI(startUpdateQuery)
+		if err != nil && !isDuplicateKeyError(err) {
+			log.Errorf("Round2: Start time update failed: %v", err)
+			continue
+		} else if isDuplicateKeyError(err) {
+			log.Warnf("Round2: Duplicate key error on start time update for task Key=%v; ignoring", task.Key)
+		}
+
+		// Propagate the start time update via consensus.
+		receiver = make(chan ReplyInfo, numOfServers)
+		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, startUpdateQuery) {
+			// Handle error if needed.
+		}
+		prioSum = mypriority.PrioVal
+		prioQueue = make(chan serverID, numOfServers)
+		for rinfo := range receiver {
+			prioQueue <- rinfo.SID
+			log.Infof("Round2: Received RPC response: pClock: %v | serverID: %v", leaderPClock, rinfo.SID)
+			fpriorities = pManager.GetFollowerPriorities(leaderPClock)
+			prioSum += fpriorities[rinfo.SID]
+			if prioSum > mypriority.Majority {
+				log.Infof("Round2: Consensus reached for start time update | pClock: %v | elapsed: %v ms",
+					leaderPClock, time.Since(startTime).Milliseconds())
+				break
+			}
+		}
+		leaderPClock++
+		err = pManager.UpdateFollowerPriorities(leaderPClock, prioQueue, mystate.GetLeaderID())
+		if err != nil {
+			log.Errorf("Round2: UpdateFollowerPriorities failed: %v", err)
+			return
+		}
+		log.Infof("Round2: Priority updated for pClock %v", leaderPClock)
+
+		// --- Dispatch Task: Send via gRPC ---
+		taskId, err := strconv.Atoi(task.Key)
+		if err != nil {
+			log.Errorf("Task Execution: Invalid TaskID for task Key=%v: %v", task.Key, err)
+			continue
+		}
+		assignedBoard, err := strconv.Atoi(task.Values["assigned_board"])
+		if err != nil {
+			log.Errorf("Task Execution: Invalid assigned_board for task Key=%v: %v", task.Key, err)
+			continue
+		}
+		schedulerAddress := getSchedulerAddress(assignedBoard)
+		execReply, err := sendTaskToScheduler(schedulerAddress, task)
+		if err != nil {
+			log.Errorf("Task Execution: sendTaskToScheduler failed for task Key=%v: %v", task.Key, err)
+			continue
+		}
+		log.Infof("Task %v (TaskID=%v) executed with reply: %v", task.Key, taskId, execReply)
+
+		// --- Consensus Round 3: Finalization Update ---
+		startTime = time.Now()
+		completionTime := time.Now().Format(time.RFC3339)
+		// It is a good idea to update the task values as well.
+		task.Values["completion_time"] = completionTime
+		finalQuery := createFinalizationUpdateQuery(task, completionTime)
+		// Update leader’s DB.
+		_, _, err = mongoDbLeader.LeaderAPI(finalQuery)
+		if err != nil && !isDuplicateKeyError(err) {
+			log.Errorf("Round3: Finalization update failed: %v", err)
+		} else if isDuplicateKeyError(err) {
+			log.Warnf("Round3: Duplicate key error on finalization update for task Key=%v; ignoring", task.Key)
+		}
+		// Propagate finalization via consensus.
+		receiver = make(chan ReplyInfo, numOfServers)
+		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, finalQuery) {
+			// Handle error if needed.
+		}
+		prioSum = mypriority.PrioVal
+		prioQueue = make(chan serverID, numOfServers)
+		for rinfo := range receiver {
+			prioQueue <- rinfo.SID
+			log.Infof("Round3: Received RPC response: pClock: %v | serverID: %v", leaderPClock, rinfo.SID)
+			fpriorities = pManager.GetFollowerPriorities(leaderPClock)
+			prioSum += fpriorities[rinfo.SID]
+			if prioSum > mypriority.Majority {
+				log.Infof("Round3: Consensus reached for finalization update | pClock: %v | elapsed: %v ms",
+					leaderPClock, time.Since(startTime).Milliseconds())
+				break
+			}
+		}
+		leaderPClock++
+		err = pManager.UpdateFollowerPriorities(leaderPClock, prioQueue, mystate.GetLeaderID())
+		if err != nil {
+			log.Errorf("Round3: UpdateFollowerPriorities failed: %v", err)
+			return
+		}
+		log.Infof("Round3: Priority updated for pClock %v", leaderPClock)
 	}
 }
 
@@ -294,6 +362,18 @@ func createAssignmentUpdateQuery(task mongodb.Query, selectedNode int) mongodb.Q
 	return updateQuery
 }
 
+func createStartTimeUpdateQuery(task mongodb.Query, startTime string) mongodb.Query {
+	updateQuery := mongodb.Query{
+		Op:    mongodb.UPDATE,
+		Table: task.Table,
+		Key:   task.Key,
+		Values: map[string]string{
+			"start_time": startTime,
+		},
+	}
+	return updateQuery
+}
+
 func createFinalizationUpdateQuery(task mongodb.Query, completionTime string) mongodb.Query {
 	updateQuery := mongodb.Query{
 		Op:    mongodb.UPDATE,
@@ -347,6 +427,9 @@ func sendTaskToScheduler(selectedNode string, task mongodb.Query) (string, error
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	log.Infof("Sending TaskStatus: task_id=%d, assigned_board=%d, status=%d, submit_time=%s, gpu_req=%s, deadline=%d, completion_time=%s",
+		int32(taskId), int32(assignedBoard), int32(status), task.Values["submit_time"], task.Values["gpu_req"], int32(deadline), task.Values["completion_time"])
 
 	reply, err := client.ExecuteTask(ctx, grpcTask)
 	if err != nil {

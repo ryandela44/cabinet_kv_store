@@ -29,8 +29,7 @@ public:
         std::cout << "  Submit Time: " << request->submit_time() << std::endl;
         std::cout << "  Start Time: " << request->start_time() << std::endl;
 
-        // Here, you would insert the real scheduling logic for your GPU task.
-        // For this example, we simulate execution with a sleep.
+        //Simulate task execution !
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         reply->set_reply("Task executed successfully by C++ scheduler");
