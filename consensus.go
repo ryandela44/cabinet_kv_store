@@ -118,16 +118,12 @@ func startSyncCabInstance() {
 		} else if isDuplicateKeyError(err) {
 			log.Warnf("Round1: Duplicate key error for task Key=%v; ignoring", task.Key)
 		}
+		// Record the start of Round 1.
 		perfM.RecordStarter(leaderPClock)
 
 		// Propagate the assignment update via consensus.
 		receiver := make(chan ReplyInfo, numOfServers)
-		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, assignQuery) {
-			if err := perfM.SaveToFile(); err != nil {
-				log.Errorf("Round1: perfM save to file failed: %v", err)
-			}
-			return
-		}
+		issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, assignQuery)
 
 		// Wait for consensus responses.
 		prioSum := mypriority.PrioVal
@@ -147,6 +143,10 @@ func startSyncCabInstance() {
 					leaderPClock, time.Since(startTime).Milliseconds(), mystate.GetCommitIndex())
 				break
 			}
+		}
+		// Save metrics after Round 1.
+		if err := perfM.SaveToFile(); err != nil {
+			log.Errorf("Round1: perfM save to file failed: %v", err)
 		}
 		leaderPClock++
 		err = pManager.UpdateFollowerPriorities(leaderPClock, prioQueue, mystate.GetLeaderID())
@@ -170,12 +170,12 @@ func startSyncCabInstance() {
 		} else if isDuplicateKeyError(err) {
 			log.Warnf("Round2: Duplicate key error on start time update for task Key=%v; ignoring", task.Key)
 		}
+		// Record the start of Round 2.
+		perfM.RecordStarter(leaderPClock)
 
 		// Propagate the start time update via consensus.
 		receiver = make(chan ReplyInfo, numOfServers)
-		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, startUpdateQuery) {
-			// Handle error if needed.
-		}
+		issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, startUpdateQuery)
 		prioSum = mypriority.PrioVal
 		prioQueue = make(chan serverID, numOfServers)
 		for rinfo := range receiver {
@@ -184,10 +184,18 @@ func startSyncCabInstance() {
 			fpriorities = pManager.GetFollowerPriorities(leaderPClock)
 			prioSum += fpriorities[rinfo.SID]
 			if prioSum > mypriority.Majority {
+				if err := perfM.RecordFinisher(leaderPClock); err != nil {
+					log.Errorf("Round2: PerfMeter failed: %v", err)
+					return
+				}
 				log.Infof("Round2: Consensus reached for start time update | pClock: %v | elapsed: %v ms",
 					leaderPClock, time.Since(startTime).Milliseconds())
 				break
 			}
+		}
+		// Save metrics after Round 2.
+		if err := perfM.SaveToFile(); err != nil {
+			log.Errorf("Round2: perfM save to file failed: %v", err)
 		}
 		leaderPClock++
 		err = pManager.UpdateFollowerPriorities(leaderPClock, prioQueue, mystate.GetLeaderID())
@@ -219,7 +227,7 @@ func startSyncCabInstance() {
 		// --- Consensus Round 3: Finalization Update ---
 		startTime = time.Now()
 		completionTime := time.Now().Format(time.RFC3339)
-		// It is a good idea to update the task values as well.
+		// Update the task values.
 		task.Values["completion_time"] = completionTime
 		finalQuery := createFinalizationUpdateQuery(task, completionTime)
 		// Update leader’s DB.
@@ -229,11 +237,12 @@ func startSyncCabInstance() {
 		} else if isDuplicateKeyError(err) {
 			log.Warnf("Round3: Duplicate key error on finalization update for task Key=%v; ignoring", task.Key)
 		}
+		// Record the start of Round 3.
+		perfM.RecordStarter(leaderPClock)
+
 		// Propagate finalization via consensus.
 		receiver = make(chan ReplyInfo, numOfServers)
-		if issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, finalQuery) {
-			// Handle error if needed.
-		}
+		issueMongoDBOps(leaderPClock, fpriorities, serviceMethod, receiver, finalQuery)
 		prioSum = mypriority.PrioVal
 		prioQueue = make(chan serverID, numOfServers)
 		for rinfo := range receiver {
@@ -242,10 +251,18 @@ func startSyncCabInstance() {
 			fpriorities = pManager.GetFollowerPriorities(leaderPClock)
 			prioSum += fpriorities[rinfo.SID]
 			if prioSum > mypriority.Majority {
+				if err := perfM.RecordFinisher(leaderPClock); err != nil {
+					log.Errorf("Round3: PerfMeter failed: %v", err)
+					return
+				}
 				log.Infof("Round3: Consensus reached for finalization update | pClock: %v | elapsed: %v ms",
 					leaderPClock, time.Since(startTime).Milliseconds())
 				break
 			}
+		}
+		// Save metrics after Round 3.
+		if err := perfM.SaveToFile(); err != nil {
+			log.Errorf("Round3: perfM save to file failed: %v", err)
 		}
 		leaderPClock++
 		err = pManager.UpdateFollowerPriorities(leaderPClock, prioQueue, mystate.GetLeaderID())

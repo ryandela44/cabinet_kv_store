@@ -15,3 +15,5 @@
 294	1972	1743621354469448813	CMakeFiles/gpu_scheduler.dir/generated/gpu_status.pb.cc.o	428ebd8eee34a712
 294	3048	1743621355557960020	CMakeFiles/gpu_scheduler.dir/generated/gpu_status.grpc.pb.cc.o	56ab5704ebfb6495
 1	118	1744158975140943976	build.ninja	3cdc8db3b48d463a
+12	2248	1744225778042604282	CMakeFiles/gpu_scheduler.dir/main.cpp.o	df274a03e506872b
+2248	2405	1744225778204710045	gpu_scheduler	99152ad682fe2d54

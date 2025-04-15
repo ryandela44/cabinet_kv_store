@@ -54,7 +54,7 @@ func loadCommandLineInputs() {
 
 	flag.Float64Var(&ratioTryStep, "rstep", 0.001, "rate for trying qualified ratio")
 
-	flag.BoolVar(&enablePriority, "ep", false, "true -> cabinet; false -> raft")
+	flag.BoolVar(&enablePriority, "ep", true, "true -> cabinet; false -> raft")
 
 	// Plain message input parameters
 	flag.IntVar(&msgsize, "ms", 512, "message size")
